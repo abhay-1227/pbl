@@ -1,0 +1,62 @@
+// This is your Prisma schema file for PantryPilot AI
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  email         String          @unique
+  name          String
+  password      String
+  avatar        String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  nutritionLogs NutritionLog[]
+  savedRecipes  SavedRecipe[]
+}
+
+model NutritionLog {
+  id          String   @id @default(cuid())
+  userId      String
+  date        String   // Format: YYYY-MM-DD
+  meal        String   // breakfast, lunch, dinner, snacks
+  foodName    String
+  quantity    Float
+  unit        String
+  calories    Float
+  protein     Float
+  carbs       Float
+  fats        Float
+  vitaminA    Float    @default(0)
+  vitaminC    Float    @default(0)
+  calcium     Float    @default(0)
+  iron        Float    @default(0)
+  potassium   Float    @default(0)
+  fiber       Float    @default(0)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date, id])
+}
+
+model SavedRecipe {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  cuisine     String
+  method      String
+  minutes     Int
+  servings    Int
+  ingredients String   // JSON string
+  steps       String   // JSON string
+  nutrition   String   // JSON string
+  totalCalories Float
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
